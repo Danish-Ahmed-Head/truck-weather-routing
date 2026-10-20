@@ -19,6 +19,7 @@ not a certification of compliance with them.
 | 10 | Audit | [Scalability and Performance Audit](10-Scalability-Performance-Audit.md) | IEEE 1028 (audit structure) |
 | 11 | Release | [Production Readiness Review](11-Production-Readiness-Review.md) | ISO/IEC/IEEE 12207 transition process |
 | 12 | Operation | [Operations and Maintenance Guide](12-Operations-Maintenance-Guide.md) | ISO/IEC/IEEE 12207 operation/maintenance |
+| 13 | Transition | [Deployment Guide: PythonAnywhere](13-Deploy-PythonAnywhere.md) | ISO/IEC/IEEE 12207 transition process |
 
 Standards edition check (2026-10-20): ISO/IEC/IEEE 16326:2019 confirmed current. IEEE 1028-2008 confirmed
 inactive-reserved with no replacement. 12207:2017, 29148:2018, 29119-3:2021 and IEEE 1016-2009 are cited from

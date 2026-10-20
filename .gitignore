@@ -6,3 +6,5 @@ backend/frontend_dist/
 backend/staticfiles/
 .env
 .env.*
+deploy/
+.ruff_cache/

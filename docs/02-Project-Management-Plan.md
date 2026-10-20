@@ -39,7 +39,8 @@ Status: Done = built, tested, run, verified.
 | T13 | Frontend automated tests | - | **Not done** (gap, doc 11) |
 | T14 | CI pipeline | - | **Not done**, not requested |
 | T15 | Docker image build verified | 2 | Done 2026-10-20: built with Docker 29.6.1, run with `PORT=9000` as non-root, gunicorn on Linux, 3 routes returned |
-| T16 | GitHub repo, hosting, Loom, submission | - | **Not started, needs owner approval** |
+| T16a | Hosting target chosen and prepared (PythonAnywhere free, upload bundle, guide in doc 13) | 2 | Done; bundle tested locally, **not deployed** |
+| T16b | GitHub repo, deployment, Loom, submission | - | **Not started, needs owner approval** |
 
 ## 4. Effort
 
@@ -58,7 +59,7 @@ how this work counts against it.
 
 ## 5b. Open questions for the owner (nothing here is assumed)
 
-Q1 hosting target (Coolify on your Contabo server, other, or free tier). Q2 repo visibility (private with invite
+Q1 hosting: decided, PythonAnywhere free (deploy step is the owner's). Q2 repo visibility (private with invite
 or public) and which account. Q3 exact deadline. Q4 confirm rule-boundary choices (SRS A-01..A-06). Q5 whether to
 add CI and frontend tests before submission. Q6 domain name, which decides HSTS settings.
 
