@@ -37,11 +37,12 @@ Status: Done = built, tested, run, verified.
 | T11 | Security, scalability, performance audits | 2 | Done, see docs 09, 10 |
 | T12 | Docs set (this set) | 2 | Done |
 | T13 | Frontend automated tests (Vitest) | 3 | Done, 12 tests |
-| T14 | CI pipeline (GitHub Actions) | 3 | Written and YAML-validated; **not run until pushed** |
+| T14 | CI pipeline (GitHub Actions) | 3 | Done: first run failed on a real finding (D16), second run green (backend, frontend, docker) |
 | T17 | Unknown-weather policy (FR-12): backend, UI, tests | 3 | Done, 3 backend tests, UI checked with a patched response |
 | T15 | Docker image build verified | 2 | Done 2026-10-20: built with Docker 29.6.1, run with `PORT=9000` as non-root, gunicorn on Linux, 3 routes returned |
 | T16a | Hosting target chosen and prepared (PythonAnywhere free, upload bundle, guide in doc 13) | 2 | Done; bundle tested locally, **not deployed** |
-| T16b | GitHub repo, deployment, Loom, submission | - | **Not started, needs owner approval** |
+| T16b | GitHub repo | 3 | Done 2026-10-20: public repo `Danish-Ahmed-Head/truck-weather-routing`, pushed with the owner's approval |
+| T16c | Deployment, Loom walkthrough, submission | - | **Not started, needs owner approval** |
 
 ## 4. Effort
 

@@ -44,7 +44,7 @@ Next due review: Django 6.1 is supported to Dec 2027; Django 5.2 LTS to Apr 2028
 | Date | Change |
 |---|---|
 | 2026-10-20 | Iteration 1: initial build (commit 022081f) |
-| 2026-10-20 | Iteration 3: unknown-weather policy (FR-12), Vitest (12 tests), GitHub Actions workflow, PythonAnywhere guide (doc 13) |
+| 2026-10-20 | Iteration 3: unknown-weather policy (FR-12), Vitest (12 tests), GitHub Actions workflow (green), PythonAnywhere guide (doc 13), public repo created |
 | 2026-10-20 | Iteration 2: stack upgrade, review fixes D01-D13, tests 19 to 25, hardening, docs set (commits 8858aaf and later) |
 
 ## 6. Known limits

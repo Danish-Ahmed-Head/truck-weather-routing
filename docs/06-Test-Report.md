@@ -52,10 +52,12 @@ Severity: High breaks a requirement, Medium wrong or unsafe in some cases, Low c
 | D12 | Tile URL used `{s}` subdomains, discouraged by OSM tile policy | Review | Low | Fixed |
 | D13 | Raw upstream exception text shown to users | Review | Low | Fixed (logged, generic message) |
 | D14 | Missing (null) weather hours counted as calm | Review | Medium | Fixed 2026-10-20: shown as unknown (FR-12), 3 backend tests |
+| D16 | `manage.py` had a shebang but was not marked executable in git; `ruff` on Linux (CI) rejected it. Not visible on Windows | CI | Low | Fixed: mode 100755 |
 | D15 | Open-Meteo quota counts every location requested | Analysis | Medium | Mitigated by 15-minute cache, not eliminated |
 
 ## 5. Added after the first report draft
 
 NFR-03 gap closed: `test_upstream_failure_is_502_with_generic_message` added.
 Iteration 3: D14 fixed (backend, UI, 3 tests); Vitest added (12 tests); CI workflow written, **not yet run** (needs a push).
+CI (GitHub Actions, Ubuntu, Python 3.12, Node 24): run 1 failed in the backend job on D16; run 2 passed all three jobs (backend: ruff, 28 tests, pip-audit; frontend: 12 tests, build, npm audit; docker: image build). This is the first Linux run of the lint and tests.
 Not covered: component rendering and the Leaflet map have no automated tests.

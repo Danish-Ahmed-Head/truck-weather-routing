@@ -17,7 +17,7 @@ Basis: ISO/IEC/IEEE 12207 transition process (outline). Date 2026-10-20. Verdict
 | Packaging | Dockerfile (Node 24 build, Python 3.12, Gunicorn 2 workers x 8 threads, non-root, honours `$PORT`) | Pass: built and run locally, health, index and a live search OK |
 | Packaging | Gunicorn on Linux | Pass (ran inside the container) |
 | Deploy | Hosting target | PythonAnywhere free chosen; guide in doc 13; not deployed |
-| Deploy | CI pipeline | Written (GitHub Actions: backend, frontend, docker build), **never run**; first run happens on push |
+| Deploy | CI pipeline | Pass: GitHub Actions (backend, frontend, docker build) green after fixing D16 |
 | Data | No database, nothing to back up or migrate | N/A |
 | Accessibility | Labels on inputs, slider has aria-label; keyboard operation of slider and map not tested; colour is the only risk cue on map dots (popups and table also give text) | Partial |
 | Responsive | 375 px empty state OK; with results not tested | Partial |
