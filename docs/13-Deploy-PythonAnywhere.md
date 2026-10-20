@@ -1,89 +1,56 @@
 # 13 Deployment Guide: PythonAnywhere (free Beginner plan)
 
 Decision recorded 2026-10-20: host on PythonAnywhere free. Pricing and limits read from the vendor pages on 2026-10-20.
-Status: **prepared and bundle-tested locally; not deployed.** Deploying creates an account and publishes the app, so it is the owner's step.
+Status: **deployed and verified 2026-10-20** at https://danish12ahmed.pythonanywhere.com (health check OK, full search returned 3 routes).
 
 ## 1. Fit with the free plan
 
-| Item | Free plan (vendor page, 2026-10-20) | This app |
+| Item | Free plan (vendor pages, 2026-10-20) | This app |
 |---|---|---|
 | Web apps | 1, at `USERNAME.pythonanywhere.com` | 1 |
 | Web workers | 1 | One search takes 6-14 s, so a second visitor waits |
-| CPU allowance | 100 seconds per day | Measured locally: 2.2 to 3.5 CPU-seconds per cold search, so about 30-45 fresh searches per day. PythonAnywhere's CPU speed was **not** measured |
-| Storage | 512 MB | Bundle is 135 KB; dependencies about 100 MB |
-| Outbound internet | Allowlisted hosts only | The allowlist lists `api.open-meteo.com`, `nominatim.openstreetmap.org`, `router.project-osrm.org`; map tiles load in the visitor's browser |
-| Python | Python 3.12 and 3.13 exist on the `innit` system image | Needs 3.12 or newer for Django 6.1.2 |
-| Docker | Not available | Not needed; plain WSGI |
+| CPU allowance | 100 seconds per day | Setup (installs, build) plus one search used 32.9 s. A cold search cost 2.2 to 3.5 CPU-seconds locally; PythonAnywhere's own cost per search was not measured separately |
+| Storage | 512 MB | Repository, virtualenv and build are well under the quota (temporary Node tooling is deleted after the build) |
+| Outbound internet | Allowlisted hosts only | The allowlist includes `api.open-meteo.com`, `nominatim.openstreetmap.org`, `router.project-osrm.org`, `github.com`, `pypi.org`, `registry.npmjs.org` |
+| Python | 3.12 and 3.13 on the `innit` system image | Python 3.12.8 |
+| Expiry | **Site is disabled after one month unless you click "Run until 1 month from today" on the Web tab** | Currently set to expire Fri 2026-11-20 |
 
-Not verified: whether free web apps need a periodic "extend" click (check the Web tab for an expiry notice), the maximum request time,
-and whether new accounts get the `innit` image (check Account tab, "System Image").
+Not verified: the maximum request time on the free plan.
 
-## 2. Prepare the bundle (done)
+## 2. What was done (and why it differs from the first draft of this guide)
 
-`deploy/truck-routing-bundle.zip` (git-ignored, rebuild with `python scripts/make_bundle.py` after `npm run build`).
-It unpacks to `truck-routing/backend/` and contains the built frontend. Tested by unzipping into a clean folder and
-requesting `/api/health`, `/` and both assets (all OK).
+The first draft assumed uploading a zip. The built-in browser used for the deployment has no file-upload tool, and the PythonAnywhere
+page blocks cross-origin fetches by its content security policy, so the code was pulled from the public GitHub repository instead.
+The frontend build is not in git, so it was built on the server with Node 24 installed from PyPI (`nodejs-wheel`), then the Node
+tooling was removed.
 
-## 3. Steps (replace USERNAME with your PythonAnywhere username)
+1. Clone: `git clone https://github.com/Danish-Ahmed-Head/truck-weather-routing.git` (home folder).
+2. Virtualenv: `mkvirtualenv --python=/usr/bin/python3.12 truck-venv`, then `pip install -r truck-weather-routing/backend/requirements.txt`.
+3. Frontend build: `python3.12 -m venv ~/nodeenv`, `~/nodeenv/bin/pip install nodejs-wheel`, put `~/nodeenv/bin` on PATH,
+   `cd truck-weather-routing/frontend && npm ci && npm run build` (writes `backend/frontend_dist`, about 11 s install, 0.3 s build).
+   Then `rm -rf ~/nodeenv ~/truck-weather-routing/frontend/node_modules`.
+4. Web tab: Add a new web app, accept the domain, Manual configuration, Python 3.12.
+5. Web tab Code section: Source code and Working directory `/home/USERNAME/truck-weather-routing/backend`; Virtualenv `truck-venv`.
+6. WSGI file `/var/www/USERNAME_pythonanywhere_com_wsgi.py`: adds the backend folder to `sys.path`, sets `DJANGO_SETTINGS_MODULE=config.settings`,
+   `DJANGO_ALLOWED_HOSTS=USERNAME.pythonanywhere.com`, a `HTTP_USER_AGENT` that links to the repository, and `DJANGO_SECRET_KEY`.
+   The key was generated on the server by a short script that wrote the file directly and then deleted itself, so the key was never displayed or typed.
+7. Reload the web app, then check `/api/health` and run a search.
 
-**A. Account.** Go to pythonanywhere.com, click **Pricing & signup**, click **Create a Beginner account**, pick a username
-(it becomes your web address), confirm your email, log in.
+## 3. Updating later
 
-**B. Upload.** Click the **Files** tab. Under "Upload a file" click **Upload a file**, choose
-`D:\Dev\truck-weather-routing\deploy\truck-routing-bundle.zip`. It lands in `/home/USERNAME`.
+In a Bash console: `cd ~/truck-weather-routing && git pull`. If the frontend changed, rebuild it as in step 3 (or ask for the bundle route
+using `scripts/make_bundle.py` and the Files tab upload). Then click **Reload** on the Web tab.
 
-**C. Install.** Click the **Consoles** tab, under "Start a new console" click **Bash**. Type each line and press Enter:
+## 4. Keeping it alive
 
-```bash
-unzip -o truck-routing-bundle.zip
-mkvirtualenv --python=/usr/bin/python3.12 truck-venv
-pip install -r truck-routing/backend/requirements.txt
-python -c "import secrets; print(secrets.token_urlsafe(64))"
-```
+Log in at least once a month and click **Run until 1 month from today** on the Web tab. PythonAnywhere emails a reminder a week before.
 
-Copy the long text the last line prints (the secret key). If `python3.12` is not found, run `ls /usr/bin/python3*` and use
-the highest 3.12 or 3.13 path.
+## 5. If something fails
 
-**D. Create the web app.** Click the **Web** tab, **Add a new web app**, **Next** (domain page), choose **Manual configuration**
-(not "Django"), choose **Python 3.12**, **Next**.
+Web tab, Log files: Error log and Server log. Common causes: a typo in the username in the WSGI paths, a wrong virtualenv name, or
+`DJANGO_ALLOWED_HOSTS` not matching the address.
 
-**E. Point it at the code.** On the Web tab:
-1. "Virtualenv": click "Enter path to a virtualenv", type `truck-venv`, click the tick.
-2. "Code": set **Source code** and **Working directory** to `/home/USERNAME/truck-routing/backend`.
+## 6. Not set on purpose
 
-**F. Settings file.** On the Web tab click the **WSGI configuration file** link (`/var/www/USERNAME_pythonanywhere_com_wsgi.py`).
-Delete everything, paste this, replace the three capitalised values, click **Save**:
-
-```python
-import os
-import sys
-
-path = "/home/USERNAME/truck-routing/backend"
-if path not in sys.path:
-    sys.path.insert(0, path)
-
-os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
-os.environ["DJANGO_SECRET_KEY"] = "PASTE_THE_KEY_FROM_STEP_C"
-os.environ["DJANGO_ALLOWED_HOSTS"] = "USERNAME.pythonanywhere.com"
-os.environ["HTTP_USER_AGENT"] = "weather-aware-truck-routing/1.0 (contact: YOUR_EMAIL)"
-
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
-```
-
-The key stays in this file on PythonAnywhere only; it is not in the repository. Nominatim asks for a User-Agent with a contact address.
-
-**G. Go live.** Back on the Web tab click the big green **Reload USERNAME.pythonanywhere.com** button. Open
-`https://USERNAME.pythonanywhere.com/api/health` (should show `{"status": "ok"}`), then the main address and run a search.
-
-**H. If something fails.** Web tab, "Log files", open the **Error log** and **Server log**. Common causes: a typo in
-`USERNAME`, wrong virtualenv name, or `DJANGO_ALLOWED_HOSTS` not matching the address.
-
-## 4. Updating later
-
-Rebuild the bundle, upload it again (step B), run `unzip -o truck-routing-bundle.zip` in a Bash console, click **Reload**.
-
-## 5. Not set on purpose
-
-`DJANGO_FORCE_HTTPS` is left off because it was not verified how PythonAnywhere forwards the HTTPS header; turning it on
-wrongly could cause a redirect loop. Set it only after testing.
+`DJANGO_FORCE_HTTPS` is left off because it was not verified how PythonAnywhere forwards the HTTPS header; turning it on wrongly
+could cause a redirect loop. Set it only after testing.

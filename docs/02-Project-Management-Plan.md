@@ -42,7 +42,8 @@ Status: Done = built, tested, run, verified.
 | T15 | Docker image build verified | 2 | Done 2026-10-20: built with Docker 29.6.1, run with `PORT=9000` as non-root, gunicorn on Linux, 3 routes returned |
 | T16a | Hosting target chosen and prepared (PythonAnywhere free, upload bundle, guide in doc 13) | 2 | Done; bundle tested locally, **not deployed** |
 | T16b | GitHub repo | 3 | Done 2026-10-20: public repo `Danish-Ahmed-Head/truck-weather-routing`, pushed with the owner's approval |
-| T16c | Deployment, Loom walkthrough, submission | - | **Not started, needs owner approval** |
+| T16c | Deployment to PythonAnywhere | 3 | Done 2026-10-20: https://danish12ahmed.pythonanywhere.com, health OK, live search returned 3 routes. Expires 2026-11-20 unless renewed monthly |
+| T16d | Loom walkthrough and submission | - | **Not started, needs owner approval** |
 
 ## 4. Effort
 
