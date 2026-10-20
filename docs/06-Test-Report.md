@@ -6,7 +6,8 @@ Basis: ISO/IEC/IEEE 29119-3. Version 1.0, 2026-10-20. Environment: see [05](05-T
 
 | Check | Command | Result |
 |---|---|---|
-| Unit and integration | `manage.py test -v 2` | **25 run, 25 passed, 0 failed** (about 0.1 s) |
+| Unit and integration (backend) | `manage.py test -v 2` | **28 run, 28 passed, 0 failed** (about 0.1 s) |
+| Frontend unit | `npm test` (Vitest 5.0.5) | **12 run, 12 passed** |
 | Python lint | `ruff check` | All checks passed |
 | Django system check | `manage.py check` | No issues |
 | Python dependency audit | `pip-audit -r requirements.txt` | No known vulnerabilities |
@@ -17,7 +18,7 @@ Basis: ISO/IEC/IEEE 29119-3. Version 1.0, 2026-10-20. Environment: see [05](05-T
 
 ## 2. Test cases by suite
 
-test_risk: 8 passed. test_planner: 11 passed. test_views: 6 passed. Names are listed in [05](05-Test-Plan.md) section 5.
+test_risk: 8 passed. test_planner: 14 passed. test_views: 6 passed. Vitest: risk.test 7, heat.test 5. Names are listed in [05](05-Test-Plan.md) section 5.
 
 ## 3. Manual system tests
 
@@ -28,6 +29,7 @@ test_risk: 8 passed. test_planner: 11 passed. test_views: 6 passed. Names are li
 | M3 | Phone width 375 px, empty state | Pass: no horizontal scroll, form usable. **Not tested** with results shown or with keyboard on the slider |
 | M4 | Denver to Denver | Pass after fix: HTTP 400 "same place" |
 | M5 | Los Angeles to New York live | Pass: 3 routes (2794, 2779, 3073 mi), 57-62 checkpoints, 12.1 s, 169 KB |
+| M7 | Unknown-data UI: grey dots, "No data" chips, route warning, grey risk-bar segment | Pass using one patched API response (real nulls occur only at the far end of the forecast range) |
 | M6 | Real weather at the time of testing was calm | Risk colours above Low were therefore seen only in the 1-checkpoint Moderate case. High/Severe/No Travel visuals are **not** seen on live data |
 
 ## 4. Defect log
@@ -49,10 +51,11 @@ Severity: High breaks a requirement, Medium wrong or unsafe in some cases, Low c
 | D11 | Three old servers kept port 8000, so one round of checks hit stale code; `pkill` does not work in this shell | Verification | Process | Fixed by killing by PID; final checks ran on a fresh server |
 | D12 | Tile URL used `{s}` subdomains, discouraged by OSM tile policy | Review | Low | Fixed |
 | D13 | Raw upstream exception text shown to users | Review | Low | Fixed (logged, generic message) |
-| D14 | Missing (null) weather hours count as calm | Review | Medium | **Open**, accepted shortcut, SRS A-07 |
+| D14 | Missing (null) weather hours counted as calm | Review | Medium | Fixed 2026-10-20: shown as unknown (FR-12), 3 backend tests |
 | D15 | Open-Meteo quota counts every location requested | Analysis | Medium | Mitigated by 15-minute cache, not eliminated |
 
 ## 5. Added after the first report draft
 
-NFR-03 gap closed: `test_upstream_failure_is_502_with_generic_message` added (suite now 25 tests).
-Not yet covered: the React UI has no automated tests (doc 11).
+NFR-03 gap closed: `test_upstream_failure_is_502_with_generic_message` added.
+Iteration 3: D14 fixed (backend, UI, 3 tests); Vitest added (12 tests); CI workflow written, **not yet run** (needs a push).
+Not covered: component rendering and the Leaflet map have no automated tests.

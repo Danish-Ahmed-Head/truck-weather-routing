@@ -6,11 +6,13 @@ export interface Checkpoint {
   level: number;
   label: string;
   drivers: string[];
-  wind_mph: number;
-  rain_in_hr: number;
-  snow_in_hr: number;
+  wind_mph: number | null;
+  rain_in_hr: number | null;
+  snow_in_hr: number | null;
   forecast_beyond_range: boolean;
-  /** Risk level at this spot for each hour 0..48 after departure. */
+  /** True when the forecast has no data for this checkpoint's hour (level is then 0 and not counted as risk). */
+  unknown: boolean;
+  /** Risk level at this spot for each hour 0..48 after departure; -1 where the forecast has no data. */
   forecast: number[];
 }
 
@@ -20,6 +22,7 @@ export interface RouteStats {
   high_miles: number;
   moderate_miles: number;
   low_miles: number;
+  unknown_miles: number;
   avg_risk: number;
   max_level: number;
 }

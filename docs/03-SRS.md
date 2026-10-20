@@ -24,6 +24,7 @@ Verification methods: T = automated test, D = demonstration in the running app, 
 | FR-09 | The map shows all routes, checkpoints, risk levels, ETAs and route summaries. | D |
 | FR-10 | A weather heatmap along the trip corridor has a 0-48 hour forecast slider. | D |
 | FR-11 | Invalid input (missing place, same place, bad load, date outside forecast window) gets a clear error. | T |
+| FR-12 | An hour with no forecast data is shown as unknown (grey, "No data"), is never treated as calm, and a route with gaps ranks below an otherwise equal fully forecast route. | T, D |
 
 ### Threshold table (from the brief)
 
@@ -54,13 +55,13 @@ C-01 Third-party APIs allowed (brief). C-02 Free public services need no API key
 
 | ID | Interpretation | Why it needed deciding |
 |---|---|---|
-| A-01 | Lower bound inclusive for Moderate/High/Severe; rain and snow No Travel strictly above 1.00 and 3.0 as written; wind No Travel at >=55. | Brief ranges overlap at edges (rain 0.25) |
+| A-01 | Lower bound inclusive for Moderate/High/Severe; rain and snow No Travel strictly above 1.00 and 3.0 as written; wind No Travel at >=55. **Confirmed by the owner 2026-10-20 (higher band at a shared edge).** | Brief ranges overlap at edges (rain 0.25) |
 | A-02 | "Every 10 / 25 / 50 miles" is a spacing the user may pick; "Auto" uses 10 mi under 150 mi, 25 mi under 500, 50 mi beyond. | Brief does not say how to choose |
 | A-03 | Wind is sustained 10 m wind speed, not gusts. | Brief says "wind" only |
 | A-04 | Snow is Open-Meteo snowfall (cm snow depth per hour) converted to inches. | Brief says "in/hr" without saying depth or water |
 | A-05 | No Travel miles are compared before Severe miles when ranking; mileage compared in 5-mile buckets, risk in 0.1 steps. | Brief lists Severe first and "balancing" with time |
 | A-06 | Truck duration is OSRM car duration x 1.15. | OSRM has no truck profile |
-| A-07 | Missing (null) weather hours count as calm. Known weakness, doc 08 F-14. | Needs a policy |
+| A-07 | Missing (null) weather hours are unknown, not calm (FR-12). **Decided by the owner 2026-10-20.** Live check: every location returned 5 null hours at the end of the 16-day range. | Needs a policy |
 | A-08 | Departure must be between 24 hours ago and 12 days ahead. | Forecast window is 16 days |
 | A-09 | Heatmap hour 0 is the departure time; slider shows a fixed clock time for the whole corridor, not per-ETA. | Brief says "0-48 hour forecast slider" |
 

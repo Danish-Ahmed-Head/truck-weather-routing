@@ -49,3 +49,5 @@ th { position: sticky; top: 0; background: #f0f2f5; }
 
 /* Soft corridor look for the weather heatmap segments. */
 .leaflet-heat-pane { filter: blur(7px); }
+
+.warn { font-size: 12px; padding: 6px 8px; background: #fff4e5; border-radius: 6px; color: #7a4100; }

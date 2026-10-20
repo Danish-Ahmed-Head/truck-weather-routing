@@ -94,6 +94,21 @@ def _checkpoint_plan(route, requested_interval):
     return interval, miles, locations
 
 
+UNKNOWN = -1  # forecast strip value for an hour with no data
+
+
+def _assess_at(series, idx, load_lb):
+    """Risk result at hourly slot idx, or None when the forecast has no data there."""
+    wind, rain, snow = series["wind"][idx], series["rain"][idx], series["snow"][idx]
+    if wind is None or rain is None or snow is None:
+        return None
+    return risk.assess(wind, rain, snow, load_lb)
+
+
+def _rounded(value, digits):
+    return None if value is None else round(value, digits)
+
+
 def build_route(route, departure, load_lb, requested_interval, weather):
     total = route["distance_mi"]
     interval, miles, locations = _checkpoint_plan(route, requested_interval)
@@ -101,12 +116,16 @@ def build_route(route, departure, load_lb, requested_interval, weather):
 
     checkpoints = []
     miles_at_level = [0.0] * 5
+    unknown_miles = 0.0
     weighted = 0.0
     for m, seg, (lat, lon) in zip(miles, segments, locations):
         eta = departure + timedelta(hours=route["duration_h"] * (m / total if total else 0))
         series = weather[round_key(lat, lon)]
         idx, clamped = hour_index(series, eta)
-        result = risk.assess(series["wind"][idx], series["rain"][idx], series["snow"][idx], load_lb)
+        result = _assess_at(series, idx, load_lb)
+        unknown = result is None
+        if unknown:
+            result = {"level": risk.LOW, "label": "No data", "drivers": []}
 
         # Heatmap strip: risk at this spot for each hour 0..48 after departure (fixed clock, not ETA).
         start, _ = hour_index(series, departure)
@@ -114,10 +133,14 @@ def build_route(route, departure, load_lb, requested_interval, weather):
         strip = []
         for h in range(FORECAST_HOURS + 1):
             j = min(last, start + h)
-            strip.append(risk.assess(series["wind"][j], series["rain"][j], series["snow"][j], load_lb)["level"])
+            at_hour = _assess_at(series, j, load_lb)
+            strip.append(UNKNOWN if at_hour is None else at_hour["level"])
 
-        miles_at_level[result["level"]] += seg
-        weighted += result["level"] * seg
+        if unknown:
+            unknown_miles += seg
+        else:
+            miles_at_level[result["level"]] += seg
+            weighted += result["level"] * seg
         checkpoints.append({
             "mile": round(m, 1),
             "lat": round(lat, 5),
@@ -126,9 +149,10 @@ def build_route(route, departure, load_lb, requested_interval, weather):
             "level": result["level"],
             "label": result["label"],
             "drivers": result["drivers"],
-            "wind_mph": round(series["wind"][idx], 1),
-            "rain_in_hr": round(series["rain"][idx], 2),
-            "snow_in_hr": round(series["snow"][idx], 2),
+            "unknown": unknown,
+            "wind_mph": _rounded(series["wind"][idx], 1),
+            "rain_in_hr": _rounded(series["rain"][idx], 2),
+            "snow_in_hr": _rounded(series["snow"][idx], 2),
             "forecast_beyond_range": clamped,
             "forecast": strip,
         })
@@ -139,7 +163,8 @@ def build_route(route, departure, load_lb, requested_interval, weather):
         "high_miles": round(miles_at_level[risk.HIGH], 1),
         "moderate_miles": round(miles_at_level[risk.MODERATE], 1),
         "low_miles": round(miles_at_level[risk.LOW], 1),
-        "avg_risk": round(weighted / total, 2) if total else 0.0,
+        "unknown_miles": round(unknown_miles, 1),
+        "avg_risk": round(weighted / (total - unknown_miles), 2) if total - unknown_miles > 0 else 0.0,
         "max_level": max(c["level"] for c in checkpoints),
     }
     return {
@@ -155,15 +180,17 @@ def build_route(route, departure, load_lb, requested_interval, weather):
 
 
 def rank_key(r):
-    """No Travel miles, then Severe, then High miles, lowest average risk, shortest time.
+    """No Travel, Severe and High miles, then miles with no forecast data, lowest average risk, shortest time.
 
     Mileage and risk are bucketed so a 1-mile difference does not outweigh a much faster route.
+    Unknown miles rank after the brief's risk tiers so a fully forecast route beats one with gaps.
     """
     s = r["stats"]
     return (
         round(s["no_travel_miles"] / MILE_BUCKET),
         round(s["severe_miles"] / MILE_BUCKET),
         round(s["high_miles"] / MILE_BUCKET),
+        round(s["unknown_miles"] / MILE_BUCKET),
         round(s["avg_risk"] / RISK_BUCKET),
         r["duration_h"],
     )

@@ -1,5 +1,28 @@
 export const LEVEL_LABELS = ["Low", "Moderate", "High", "Severe", "No Travel"];
 export const LEVEL_COLORS = ["#2e9e5b", "#e0b400", "#f07f1d", "#d62828", "#5b1a6e"];
+/** Forecast strip value and colour for an hour with no weather data. */
+export const UNKNOWN = -1;
+export const UNKNOWN_COLOR = "#9aa0a6";
+
+const LEVEL_RGB = LEVEL_COLORS.map((hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+});
+
+/** Blend between level colours so a fractional level (between two checkpoints) gets a smooth hue. */
+export function levelColor(level: number): string {
+  if (level < 0) return UNKNOWN_COLOR;
+  const lo = Math.min(4, Math.floor(level));
+  const hi = Math.min(4, lo + 1);
+  const t = level - lo;
+  const c = LEVEL_RGB[lo].map((v, k) => Math.round(v + (LEVEL_RGB[hi][k] - v) * t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+
+export const checkpointColor = (c: { level: number; unknown: boolean }) => (c.unknown ? UNKNOWN_COLOR : LEVEL_COLORS[c.level]);
+
+export const fmtNum = (v: number | null) => (v === null ? "-" : String(v));
+
 export const ROUTE_COLORS: Record<string, string> = { A: "#1f6feb", B: "#8250df", C: "#0a8f8f", D: "#bc4c00" };
 
 export const routeColor = (id: string) => ROUTE_COLORS[id] ?? "#555";

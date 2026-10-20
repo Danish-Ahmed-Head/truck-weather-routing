@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { planRoutes } from "./api";
 import MapView from "./MapView";
-import { LEVEL_COLORS, LEVEL_LABELS, fmtDuration, fmtTime, routeColor } from "./risk";
+import { LEVEL_COLORS, LEVEL_LABELS, UNKNOWN_COLOR, checkpointColor, fmtDuration, fmtNum, fmtTime, routeColor } from "./risk";
 import type { PlanResponse, Route } from "./types";
 
 function defaultDeparture(): string {
@@ -13,11 +13,13 @@ function defaultDeparture(): string {
 
 function RiskBar({ route }: { route: Route }) {
   const s = route.stats;
-  const parts = [s.low_miles, s.moderate_miles, s.high_miles, s.severe_miles, s.no_travel_miles];
+  const parts = [s.low_miles, s.moderate_miles, s.high_miles, s.severe_miles, s.no_travel_miles, s.unknown_miles];
+  const names = [...LEVEL_LABELS, "No data"];
+  const colors = [...LEVEL_COLORS, UNKNOWN_COLOR];
   return (
-    <div className="riskbar" title={parts.map((v, i) => `${LEVEL_LABELS[i]} ${v} mi`).join(" · ")}>
+    <div className="riskbar" title={parts.map((v, i) => `${names[i]} ${v} mi`).join(" · ")}>
       {parts.map((v, i) => (
-        <span key={i} style={{ width: `${(v / route.distance_mi) * 100}%`, background: LEVEL_COLORS[i] }} />
+        <span key={i} style={{ width: `${(v / route.distance_mi) * 100}%`, background: colors[i] }} />
       ))}
     </div>
   );
@@ -46,6 +48,7 @@ function RouteCard({ route, selected, onSelect }: { route: Route; selected: bool
         <span>Avg risk {s.avg_risk.toFixed(2)}</span>
         <span style={{ color: LEVEL_COLORS[s.max_level] }}>Worst: {LEVEL_LABELS[s.max_level]}</span>
       </div>
+      {s.unknown_miles > 0 && <div className="warn">No forecast data for {s.unknown_miles.toFixed(0)} mi of this route.</div>}
       {route.recommended && route.reason && <div className="reason">{route.reason}</div>}
     </button>
   );
@@ -63,10 +66,10 @@ function CheckpointTable({ route }: { route: Route }) {
             <tr key={c.mile}>
               <td>{c.mile}</td>
               <td>{fmtTime(c.eta)}</td>
-              <td>{c.wind_mph}</td>
-              <td>{c.rain_in_hr}</td>
-              <td>{c.snow_in_hr}</td>
-              <td><span className="chip" style={{ background: LEVEL_COLORS[c.level] }}>{c.label}</span></td>
+              <td>{fmtNum(c.wind_mph)}</td>
+              <td>{fmtNum(c.rain_in_hr)}</td>
+              <td>{fmtNum(c.snow_in_hr)}</td>
+              <td><span className="chip" style={{ background: checkpointColor(c) }}>{c.label}</span></td>
             </tr>
           ))}
         </tbody>

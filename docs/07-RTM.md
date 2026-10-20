@@ -13,8 +13,9 @@ Basis: ISO/IEC/IEEE 29148. Version 1.0, 2026-10-20.
 | FR-07 | risk | `risk.assess` | `LoadRules`, `test_load_changes...` | - | Verified |
 | FR-08 | planner | `rank_key`, `_reason` | `Recommendation` (3 tests) | M1 | Verified |
 | FR-09 | App, MapView | route cards, popups, table | none | M1 | Demonstrated only |
-| FR-10 | MapView | heat segments, slider | strip length in `test_etas...` | M2 | Demonstrated only; High/Severe visuals not seen on live data |
+| FR-10 | MapView, heat.ts | heat segments, slider | strip length in `test_etas...`, `heat.test.ts` (sampling, blend) | M2 | Logic unit-tested; rendering demonstrated only; High/Severe visuals not seen on live data |
 | FR-11 | views | `parse_request`, error mapping | `RequestValidation`, `RoutesEndpoint` | M4 | Verified |
+| FR-12 | planner, services, UI | `_assess_at`, `build_route`, `heat.sampleLevels`, grey states | `MissingForecast` (3), `heat.test.ts` | M7 | Verified |
 | NFR-02 | MapView | restyle-only effect | none | Code inspection | Inspected |
 | NFR-03 | services, views | `UpstreamError` to 502 | `test_upstream_failure_is_502...` | - | Verified at the HTTP layer; client code not unit-tested |
 | NFR-04 | views | `rate_limited` | `test_rate_limit_returns_429` | - | Verified |

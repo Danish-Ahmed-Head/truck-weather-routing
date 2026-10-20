@@ -7,12 +7,12 @@ Basis: ISO/IEC/IEEE 29119-3 (test documentation). Version 1.0, 2026-10-20.
 | Level | What | How | Where |
 |---|---|---|---|
 | Static | Style, bugs, types, deploy settings | `ruff`, `tsc --noEmit`, `manage.py check --deploy` | CLI |
-| Unit | Risk rules, ETA, checkpoints, ranking | Django `SimpleTestCase`, no network | `routing/tests/test_risk.py`, `test_planner.py` |
+| Unit | Risk rules, ETA, checkpoints, ranking; frontend colour and heat logic | Django `SimpleTestCase` and Vitest, no network | `routing/tests/test_risk.py`, `test_planner.py` |
 | Integration | HTTP endpoint with fake geocoder and fake network functions | Django test client | `routing/tests/test_views.py` |
 | System (manual) | Real APIs end to end, map, slider | Browser pane, scripted JS checks | Doc 06 section 3 |
 | Non-functional | Dependency audit, performance timing, deploy checks | `pip-audit`, `npm audit`, timing scripts | Docs 09, 10 |
 
-Not covered by automation: the React UI (no frontend tests exist, doc 11 gap).
+Not covered by automation: rendering of React components and the Leaflet map (only the pure logic in `risk.ts` and `heat.ts` is unit-tested).
 
 ## 2. Environment
 
@@ -45,6 +45,8 @@ Boundary value analysis on every risk threshold (just under, on, just over). Equ
 | `Checkpoints.test_etas_increase_and_end_at_arrival` | FR-05, FR-10 strip length |
 | `Checkpoints.test_weather_is_sampled_at_eta_not_departure` | FR-05 |
 | `RequestValidation.test_rejects_bad_input` | FR-11 |
+| `MissingForecast` (3 tests) | FR-12: unknown not calm, gaps rank lower, known data has no unknown miles |
+| `risk.test.ts`, `heat.test.ts` (12 Vitest tests) | Colour blending, formatting, heat-corridor sampling and unknown propagation (FR-10, FR-12) |
 | `RoutesEndpoint` (6 tests) | FR-01, FR-11, NFR-03, NFR-04: success, same place, bad JSON/fields, GET 405, rate limit 429, upstream failure 502 |
 
 ## 6. Manual system tests

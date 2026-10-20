@@ -148,12 +148,13 @@ def fetch_weather(coords):
             raise UpstreamError("Weather service returned an unexpected response.")
         for key, loc in zip(chunk, data):
             hourly = loc["hourly"]
-            rain, showers = _column(hourly, "rain"), _column(hourly, "showers")
+            # A null hour (None) means the forecast has no data there; the planner reports it as unknown.
             out[key] = {
                 "start": datetime.fromisoformat(hourly["time"][0]).replace(tzinfo=UTC),
-                "wind": _column(hourly, "wind_speed_10m"),
-                "rain": [(r + s) / MM_PER_INCH for r, s in zip(rain, showers)],
-                "snow": [c / CM_PER_INCH for c in _column(hourly, "snowfall")],
+                "wind": hourly["wind_speed_10m"],
+                "rain": [None if r is None or s is None else (r + s) / MM_PER_INCH
+                         for r, s in zip(hourly["rain"], hourly["showers"])],
+                "snow": [None if c is None else c / CM_PER_INCH for c in hourly["snowfall"]],
             }
             cache.set(_wx_cache_key(key), out[key], WEATHER_TTL)
     return out
@@ -161,11 +162,6 @@ def fetch_weather(coords):
 
 def _wx_cache_key(key):
     return f"wx:{key[0]}:{key[1]}"
-
-
-def _column(hourly, name):
-    # shortcut: a missing hour (null) counts as calm, upgrade to flagging unknown hours as unavailable.
-    return [v if v is not None else 0.0 for v in hourly[name]]
 
 
 def hour_index(series, when):

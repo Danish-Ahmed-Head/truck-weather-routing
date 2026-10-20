@@ -36,8 +36,9 @@ Status: Done = built, tested, run, verified.
 | T10 | Line-by-line review and defect fixes | 2 | Done, residual items in doc 08 |
 | T11 | Security, scalability, performance audits | 2 | Done, see docs 09, 10 |
 | T12 | Docs set (this set) | 2 | Done |
-| T13 | Frontend automated tests | - | **Not done** (gap, doc 11) |
-| T14 | CI pipeline | - | **Not done**, not requested |
+| T13 | Frontend automated tests (Vitest) | 3 | Done, 12 tests |
+| T14 | CI pipeline (GitHub Actions) | 3 | Written and YAML-validated; **not run until pushed** |
+| T17 | Unknown-weather policy (FR-12): backend, UI, tests | 3 | Done, 3 backend tests, UI checked with a patched response |
 | T15 | Docker image build verified | 2 | Done 2026-10-20: built with Docker 29.6.1, run with `PORT=9000` as non-root, gunicorn on Linux, 3 routes returned |
 | T16a | Hosting target chosen and prepared (PythonAnywhere free, upload bundle, guide in doc 13) | 2 | Done; bundle tested locally, **not deployed** |
 | T16b | GitHub repo, deployment, Loom, submission | - | **Not started, needs owner approval** |
@@ -59,9 +60,9 @@ how this work counts against it.
 
 ## 5b. Open questions for the owner (nothing here is assumed)
 
-Q1 hosting: decided, PythonAnywhere free (deploy step is the owner's). Q2 repo visibility (private with invite
-or public) and which account. Q3 exact deadline. Q4 confirm rule-boundary choices (SRS A-01..A-06). Q5 whether to
-add CI and frontend tests before submission. Q6 domain name, which decides HSTS settings.
+Q1 hosting: decided, PythonAnywhere free (deploy step is the owner's). Q2 repo visibility: decided, public. Q3 deadline: working deadline Thu 2026-10-23 (chosen by the owner; not stated in the email).
+Q4 rule boundaries: confirmed (SRS A-01); A-02 to A-06 still unconfirmed. Q5 CI and frontend tests: both added.
+Q6 domain name, which decides HSTS settings: still open. Null-weather policy: decided (FR-12).
 
 ## 6. Tools and versions (checked 2026-10-20 against PyPI, npm and endoflife.date)
 

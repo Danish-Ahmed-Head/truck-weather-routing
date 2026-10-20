@@ -25,16 +25,15 @@ the first build, then running `ruff`, `tsc`, `django check --deploy` and the dep
 | F-11 | `App.tsx` | State setter named `setInterval_` shadows a global by convention | Accepted, cosmetic |
 | F-12 | `views.py` | `@csrf_exempt` | Accepted: stateless JSON API, no cookies or login (doc 09 S-05) |
 | F-13 | all | Pyright reports unresolved Django imports and unused lambda parameters | Not defects: editor is not using the venv |
-| F-14 | `services.py` | Missing weather hours become 0.0 (calm) | **Open**: unsafe default for a safety tool, SRS A-07. Needs an owner decision: treat as unknown and show a warning, or as worst case |
+| F-14 | `services.py` | Missing weather hours became 0.0 (calm) | Fixed (D14): unknown state end to end; owner chose to mark unknown and show a warning |
 | F-15 | `planner.py` | `_via_points` builds offsets in flat degrees; poor at high latitudes or across the date line | Open, Low; fallback only |
 | F-16 | `risk.py` | Uses sustained wind only (SRS A-03) | Open, owner to confirm |
 
 ## 3. Static analysis results
 
-`ruff`: clean. `tsc --noEmit`: clean. `django check`: clean. Tests: 25 of 25.
+`ruff`: clean. `tsc --noEmit`: clean. `django check`: clean. Tests: 28 of 28 backend, 12 of 12 frontend.
 
 ## 4. Simplicity check
 
 Removed during review: the `leaflet.heat` dependency and its type stub, the animation-frame batching in the heat
-effect. Shortcuts left with comments in code: per-process rate limit (`views.rate_limited`), null weather as calm
-(`services._column`).
+effect. Shortcut left with a comment in code: per-process rate limit (`views.rate_limited`).

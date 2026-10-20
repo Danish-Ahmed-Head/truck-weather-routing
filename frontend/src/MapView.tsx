@@ -1,6 +1,7 @@
 import L from "leaflet";
 import { useEffect, useMemo, useRef } from "react";
-import { LEVEL_COLORS, fmtTime, routeColor } from "./risk";
+import { buildSamples, sampleLevels } from "./heat";
+import { checkpointColor, fmtNum, fmtTime, levelColor, routeColor } from "./risk";
 import type { PlanResponse, Route } from "./types";
 
 interface Props {
@@ -11,64 +12,7 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
-interface HeatSample {
-  lat: number;
-  lon: number;
-  /** Position between checkpoint `i` and `i + 1` (0..1), used to blend the hourly risk. */
-  i: number;
-  t: number;
-  route: Route;
-}
-
-const HEAT_STEP_MILES = 3;
 const HEAT_PANE = "heat";
-
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.slice(1), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-const LEVEL_RGB = LEVEL_COLORS.map(hexToRgb);
-
-/** Blend between the level colours so a fractional level (between two checkpoints) gets a smooth hue. */
-function levelColor(level: number): string {
-  const lo = Math.max(0, Math.min(4, Math.floor(level)));
-  const hi = Math.min(4, lo + 1);
-  const t = level - lo;
-  const c = LEVEL_RGB[lo].map((v, k) => Math.round(v + (LEVEL_RGB[hi][k] - v) * t));
-  return `rgb(${c[0]},${c[1]},${c[2]})`;
-}
-
-/** Points densely spaced along each route's checkpoints so the heatmap reads as a continuous corridor. */
-function buildSamples(routes: Route[]): HeatSample[] {
-  const out: HeatSample[] = [];
-  for (const route of routes) {
-    const cps = route.checkpoints;
-    for (let i = 0; i < cps.length - 1; i++) {
-      const steps = Math.max(1, Math.ceil((cps[i + 1].mile - cps[i].mile) / HEAT_STEP_MILES));
-      for (let s = 0; s < steps; s++) {
-        const t = s / steps;
-        out.push({
-          lat: cps[i].lat + (cps[i + 1].lat - cps[i].lat) * t,
-          lon: cps[i].lon + (cps[i + 1].lon - cps[i].lon) * t,
-          i,
-          t,
-          route,
-        });
-      }
-    }
-    const last = cps[cps.length - 1];
-    out.push({ lat: last.lat, lon: last.lon, i: cps.length - 2, t: 1, route });
-  }
-  return out;
-}
-
-function sampleLevels(samples: HeatSample[], hour: number): number[] {
-  return samples.map(({ i, t, route }) => {
-    const a = route.checkpoints[Math.max(0, i)].forecast[hour];
-    const b = route.checkpoints[Math.min(route.checkpoints.length - 1, i + 1)].forecast[hour];
-    return a + (b - a) * t;
-  });
-}
 
 /** Leaflet treats string tooltips as HTML; place names come from a third party, so pass a text node instead. */
 function plainText(text: string): HTMLElement {
@@ -82,8 +26,8 @@ function popupHtml(route: Route, idx: number): string {
   const drivers = c.drivers.length ? `<div>${c.drivers.join("; ")}</div>` : "";
   const warn = c.forecast_beyond_range ? "<div><i>Beyond forecast range</i></div>" : "";
   return `<b>${route.name} · mile ${c.mile}</b><br/>ETA ${fmtTime(c.eta)}<br/>
-    <b style="color:${LEVEL_COLORS[c.level]}">${c.label}</b>${drivers}
-    Wind ${c.wind_mph} mph · Rain ${c.rain_in_hr} in/hr · Snow ${c.snow_in_hr} in/hr${warn}`;
+    <b style="color:${checkpointColor(c)}">${c.label}</b>${drivers}
+    Wind ${fmtNum(c.wind_mph)} mph · Rain ${fmtNum(c.rain_in_hr)} in/hr · Snow ${fmtNum(c.snow_in_hr)} in/hr${warn}`;
 }
 
 export default function MapView({ data, selectedId, hour, showHeat, onSelect }: Props) {
@@ -161,7 +105,7 @@ export default function MapView({ data, selectedId, hour, showHeat, onSelect }: 
         radius: 7,
         color: "#fff",
         weight: 2,
-        fillColor: LEVEL_COLORS[c.level],
+        fillColor: checkpointColor(c),
         fillOpacity: 1,
       })
         .bindPopup(popupHtml(route, idx))
@@ -201,7 +145,10 @@ export default function MapView({ data, selectedId, hour, showHeat, onSelect }: 
     }
     if (!m.hasLayer(heat.current)) heat.current.addTo(m);
     const levels = sampleLevels(samples, hour);
-    heatSegments.current.forEach((seg, k) => seg.setStyle({ color: levelColor((levels[k] + levels[k + 1]) / 2) }));
+    heatSegments.current.forEach((seg, k) => {
+      const [a, b] = [levels[k], levels[k + 1]];
+      seg.setStyle({ color: levelColor(a < 0 || b < 0 ? -1 : (a + b) / 2) });
+    });
   }, [samples, hour, showHeat]);
 
   return <div ref={host} className="map" />;

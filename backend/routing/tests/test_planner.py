@@ -125,3 +125,44 @@ class RequestValidation(SimpleTestCase):
                       {"departure": "nope"}, {"departure": (DEPARTURE + timedelta(days=30)).isoformat()}):
             with self.assertRaises(views.BadRequest):
                 views.parse_request({**good, **patch}, DEPARTURE)
+
+
+def no_data_fetch(null_for_lat):
+    """Fake forecast where wind is missing (None) for latitudes below `null_for_lat`, calm elsewhere."""
+    def fetch(coords):
+        out = {}
+        for lat, lon in coords:
+            key = (round(lat, 2), round(lon, 2))
+            wind = None if key[0] < null_for_lat else 5.0
+            out[key] = {
+                "start": DEPARTURE - timedelta(hours=24),
+                "wind": [wind] * 200,
+                "rain": [0.0] * 200,
+                "snow": [0.0] * 200,
+            }
+        return out
+    return fetch
+
+
+class MissingForecast(SimpleTestCase):
+    def test_missing_data_is_unknown_not_calm(self):
+        d = deps([route(40.0, 3.0, "x")], lambda lat: 5)
+        d["fetch_weather"] = no_data_fetch(null_for_lat=99)
+        result = planner.plan(ORIGIN, DEST, DEPARTURE, 10000, 25, d)[0]
+        self.assertTrue(all(c["unknown"] and c["label"] == "No data" for c in result["checkpoints"]))
+        self.assertTrue(all(set(c["forecast"]) == {planner.UNKNOWN} for c in result["checkpoints"]))
+        self.assertAlmostEqual(result["stats"]["unknown_miles"], result["distance_mi"], places=0)
+        self.assertEqual(result["stats"]["low_miles"], 0)
+        self.assertIsNone(result["checkpoints"][0]["wind_mph"])
+
+    def test_fully_forecast_route_beats_faster_route_with_gaps(self):
+        routes = [route(40.0, 3.0, "fast, no data"), route(41.0, 5.0, "slow, calm")]
+        d = deps(routes, lambda lat: 5)
+        d["fetch_weather"] = no_data_fetch(null_for_lat=40.5)
+        result = planner.plan(ORIGIN, DEST, DEPARTURE, 10000, 25, d)
+        self.assertEqual(next(r for r in result if r["recommended"])["id"], "B")
+
+    def test_known_weather_has_no_unknown_miles(self):
+        result = planner.plan(ORIGIN, DEST, DEPARTURE, 10000, 25, deps([route(40.0, 3.0, "x")], lambda lat: 5))[0]
+        self.assertEqual(result["stats"]["unknown_miles"], 0)
+        self.assertFalse(any(c["unknown"] for c in result["checkpoints"]))

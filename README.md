@@ -25,7 +25,8 @@ Single-origin build (what production uses): `cd frontend && npm run build` write
 `backend/frontend_dist/`, which Django/WhiteNoise then serves at `/` next to `/api/`.
 
 ```bash
-cd backend && DJANGO_DEBUG=1 python manage.py test     # 25 tests, no network needed
+cd backend && DJANGO_DEBUG=1 python manage.py test     # 28 tests, no network needed
+cd frontend && npm test                                 # 12 Vitest tests
 cd frontend && npm run build                           # typechecks, then builds
 ```
 

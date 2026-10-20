@@ -29,7 +29,7 @@ Health check: `GET /api/health` returns `{"status":"ok"}`.
 | 429 "Too many requests" | Rate limit | Wait 10 minutes or raise `RATE_LIMIT` in `views.py` |
 | Requests take over 15 s | Slow upstream | Check logs; see doc 10 |
 | Blank map tiles | Tile server blocked or offline | Check network access to `tile.openstreetmap.org` |
-| Everything Low on a stormy day | Possible null weather (D14) or checkpoint beyond forecast | Inspect `forecast_beyond_range` and the raw Open-Meteo response |
+| Grey "No data" checkpoints | Open-Meteo returned null hours (seen at the far end of the 16-day range) | Choose a nearer departure; inspect the raw Open-Meteo response |
 | Port 8000 already in use during development | Old server still running | `netstat -ano | grep :8000`, then `taskkill //PID <pid> //F` (do not rely on `pkill` on Windows) |
 
 ## 4. Maintenance
@@ -44,6 +44,7 @@ Next due review: Django 6.1 is supported to Dec 2027; Django 5.2 LTS to Apr 2028
 | Date | Change |
 |---|---|
 | 2026-10-20 | Iteration 1: initial build (commit 022081f) |
+| 2026-10-20 | Iteration 3: unknown-weather policy (FR-12), Vitest (12 tests), GitHub Actions workflow, PythonAnywhere guide (doc 13) |
 | 2026-10-20 | Iteration 2: stack upgrade, review fixes D01-D13, tests 19 to 25, hardening, docs set (commits 8858aaf and later) |
 
 ## 6. Known limits
