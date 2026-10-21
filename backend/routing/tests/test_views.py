@@ -59,3 +59,10 @@ class RoutesEndpoint(SimpleTestCase):
             resp = post(self.client)
         self.assertEqual(resp.status_code, 502)
         self.assertIn("unavailable", resp.json()["error"])
+
+
+class SecurityHeaders(SimpleTestCase):
+    def test_referrer_policy_lets_map_tiles_load(self):
+        # OpenStreetMap blocks tile requests that carry no Referer.
+        resp = self.client.get("/api/health")
+        self.assertEqual(resp["Referrer-Policy"], "strict-origin-when-cross-origin")

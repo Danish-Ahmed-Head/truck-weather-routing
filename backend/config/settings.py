@@ -19,6 +19,8 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.common.CommonMiddleware",
 ]
+# Django's default "same-origin" sends no Referer to tile.openstreetmap.org, which then blocks the map tiles (403).
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {}
