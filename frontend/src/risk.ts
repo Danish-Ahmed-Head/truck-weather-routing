@@ -21,6 +21,11 @@ export function levelColor(level: number): string {
 
 export const checkpointColor = (c: { level: number; unknown: boolean }) => (c.unknown ? UNKNOWN_COLOR : LEVEL_COLORS[c.level]);
 
+/** Label colour that stays readable on a level's fill: white is too faint on the lighter greens, yellows and greys. */
+export const LEVEL_TEXT = ["#14231a", "#2b2300", "#2e1700", "#fff", "#fff"];
+export const UNKNOWN_TEXT = "#1b1f24";
+export const checkpointText = (c: { level: number; unknown: boolean }) => (c.unknown ? UNKNOWN_TEXT : LEVEL_TEXT[c.level]);
+
 export const fmtNum = (v: number | null) => (v === null ? "-" : String(v));
 
 export const ROUTE_COLORS: Record<string, string> = { A: "#1f6feb", B: "#8250df", C: "#0a8f8f", D: "#bc4c00" };

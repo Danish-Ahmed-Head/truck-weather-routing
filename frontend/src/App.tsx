@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { planRoutes } from "./api";
 import MapView from "./MapView";
-import { LEVEL_COLORS, LEVEL_LABELS, UNKNOWN_COLOR, checkpointColor, fmtDuration, fmtNum, fmtTime, routeColor } from "./risk";
+import { LEVEL_COLORS, LEVEL_LABELS, LEVEL_TEXT, UNKNOWN_COLOR, checkpointColor, checkpointText, fmtDuration, fmtNum, fmtTime, routeColor } from "./risk";
 import type { PlanResponse, Route } from "./types";
 
 function defaultDeparture(): string {
@@ -37,16 +37,18 @@ function RouteCard({ route, selected, onSelect }: { route: Route; selected: bool
       </div>
       <div className="route-sub">{route.summary}</div>
       <div className="route-stats">
-        <span>{route.distance_mi} mi</span>
-        <span>{fmtDuration(route.duration_h)}</span>
-        <span>Arrive {fmtTime(route.arrival)}</span>
+        <div><b>{route.distance_mi} mi</b><span>Distance</span></div>
+        <div><b>{fmtDuration(route.duration_h)}</b><span>Drive time</span></div>
+        <div><b>{fmtTime(route.arrival)}</b><span>Arrives</span></div>
       </div>
       <RiskBar route={route} />
       <div className="route-risk">
-        <span>Severe+ {(s.severe_miles + s.no_travel_miles).toFixed(0)} mi</span>
-        <span>High {s.high_miles.toFixed(0)} mi</span>
-        <span>Avg risk {s.avg_risk.toFixed(2)}</span>
-        <span style={{ color: LEVEL_COLORS[s.max_level] }}>Worst: {LEVEL_LABELS[s.max_level]}</span>
+        <span>
+          Severe+ {(s.severe_miles + s.no_travel_miles).toFixed(0)} mi · High {s.high_miles.toFixed(0)} mi · Avg risk {s.avg_risk.toFixed(2)}
+        </span>
+        <span className="level-pill" style={{ background: LEVEL_COLORS[s.max_level], color: LEVEL_TEXT[s.max_level] }}>
+          Worst: {LEVEL_LABELS[s.max_level]}
+        </span>
       </div>
       {s.unknown_miles > 0 && <div className="warn">No forecast data for {s.unknown_miles.toFixed(0)} mi of this route.</div>}
       {route.recommended && route.reason && <div className="reason">{route.reason}</div>}
@@ -69,7 +71,7 @@ function CheckpointTable({ route }: { route: Route }) {
               <td>{fmtNum(c.wind_mph)}</td>
               <td>{fmtNum(c.rain_in_hr)}</td>
               <td>{fmtNum(c.snow_in_hr)}</td>
-              <td><span className="chip" style={{ background: checkpointColor(c) }}>{c.label}</span></td>
+              <td><span className="chip" style={{ background: checkpointColor(c), color: checkpointText(c) }}>{c.label}</span></td>
             </tr>
           ))}
         </tbody>
@@ -132,7 +134,9 @@ export default function App() {
   return (
     <div className="app">
       <aside className="sidebar">
+        <div className="panel form-panel">
         <h1>Weather-Aware Truck Routing</h1>
+        <p className="lede">Compares up to three routes using forecast wind, rain and snow at your arrival time at each checkpoint.</p>
         <form onSubmit={submit}>
           <label>Origin<input value={origin} onChange={(e) => setOrigin(e.target.value)} required /></label>
           <label>Destination<input value={destination} onChange={(e) => setDestination(e.target.value)} required /></label>
@@ -150,7 +154,11 @@ export default function App() {
           </label>
           <button className="primary" disabled={busy}>{busy ? "Finding routes…" : "Find safest route"}</button>
         </form>
+        {busy && <p className="status" role="status">Checking the forecast along each route. A new trip can take up to 20 seconds.</p>}
         {error && <div className="error" role="alert">{error}</div>}
+        </div>
+        <div className="panel results-panel">
+        {!data && !busy && !error && <p className="empty">Enter a trip and press <b>Find safest route</b>. Your routes and checkpoint weather will appear here.</p>}
         {data && (
           <>
             <p className="trip">{data.origin.name.split(",")[0]} → {data.destination.name.split(",")[0]} · departs {fmtTime(data.departure)}</p>
@@ -167,6 +175,7 @@ export default function App() {
             )}
           </>
         )}
+        </div>
       </aside>
       <main className="map-wrap">
         <MapView data={data} selectedId={selectedId} hour={hour} showHeat={showHeat} onSelect={setSelectedId} />

@@ -92,7 +92,8 @@ export default function MapView({ data, selectedId, hour, showHeat, onSelect }: 
     const m = map.current;
     if (!m || !data) return;
     const all = data.routes.flatMap((r) => r.geometry);
-    m.fitBounds(L.latLngBounds(all as L.LatLngTuple[]), { padding: [40, 40] });
+    // Extra room at the bottom keeps the route clear of the floating heatmap panel.
+    m.fitBounds(L.latLngBounds(all as L.LatLngTuple[]), { paddingTopLeft: [40, 40], paddingBottomRight: [40, 150] });
   }, [data]);
 
   // Checkpoint dots for the selected route only, to keep the map readable.
