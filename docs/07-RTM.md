@@ -21,7 +21,7 @@ Basis: ISO/IEC/IEEE 29148. Version 1.0, 2026-10-20.
 | NFR-04 | views | `rate_limited` | `test_rate_limit_returns_429` | - | Verified |
 | NFR-05 | settings | env secret | none | `check --deploy` | Inspected |
 | NFR-06 | - | - | - | pip-audit, npm audit | Verified |
-| NFR-07 | styles | media query | none | M3 partial | Partly verified |
+| NFR-07 | styles | media query | none | M3, M9 (375 and 768 px with results), M10 (slider by arrow keys) | Verified for phone, tablet and keyboard slider; screen reader not tested |
 | NFR-08 | docs | this set, README | - | - | Done |
 
 Unverified or gaps: FR-09 and FR-10 have no automated tests; NFR-07 is partial.

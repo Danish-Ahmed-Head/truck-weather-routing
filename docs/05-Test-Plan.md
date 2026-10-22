@@ -52,7 +52,7 @@ Boundary value analysis on every risk threshold (just under, on, just over). Equ
 ## 6. Manual system tests
 
 M1 search Denver to Omaha: 3 routes, recommended badge, checkpoint table. M2 slider moves and heat colours change.
-M3 phone width (375 px) has no horizontal scroll. M4 same-place error. M5 long route (Los Angeles to New York).
+M3 phone width (375 px) and tablet (768 px) have no horizontal scroll, with results shown. M4 same-place error. M5 long route (Los Angeles to New York).
 
 ## 7. Defect handling
 

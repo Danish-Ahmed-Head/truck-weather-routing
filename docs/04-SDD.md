@@ -73,3 +73,11 @@ interpolated between neighbouring checkpoints; drawn in its own canvas pane with
 ## 7. Resources and limits
 
 Weather payload per location is about 384 hours x 4 variables. Public API quotas apply (doc 10).
+
+## 8. UI layout (updated 2026-10-21)
+
+- Desktop: a 420 px sidebar (form panel, then results panel) beside the map. Phone and tablet (800 px and narrower): one column in the order form, map, results, so the map is not buried under the route list. Below 480 px the Departure and Load fields stack.
+- Route card: distance, drive time and arrival as labelled figures, a risk bar, one line of Severe+/High/average-risk miles and a pill for the worst level. Pill and chip text colours come from `LEVEL_TEXT` in `risk.ts` so labels stay readable on yellow, orange and grey.
+- While a search runs the form shows a status line, because a new trip can take 15 to 20 seconds; before the first search an empty-state hint explains what to do.
+- `MapView` fits all routes with 150 px of bottom padding so the floating heat panel never covers the route.
+- The server sends `Referrer-Policy: strict-origin-when-cross-origin` (Django's default `same-origin` made OpenStreetMap block the map tiles, defect D17).

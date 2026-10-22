@@ -7,10 +7,11 @@ Outline: IEEE 1028 audit structure. Date 2026-10-20. Measured on a Windows 11 la
 | Measure | Value | How |
 |---|---|---|
 | Denver to Omaha, end to end (first run, cold) | 9.5 s | Django test client, live APIs |
+| Live site, 2026-10-21 | Denver to Omaha (auto interval) 4.3 s by curl; a new 10-mile-checkpoint trip (Salt Lake City to Great Falls) took between 10 and 20 s in the browser (not timed more precisely) | curl and browser on the PythonAnywhere site |
 | Los Angeles to New York, end to end | 12.1 s, 169 KB, 3 routes, 57-62 checkpoints | same |
 | Planner CPU alone, 3 routes x 30,000 points | 267 ms, 169 KB | synthetic benchmark with fake weather |
-| Frontend bundle | 379.5 kB JS (115.6 kB gzip), 18.3 kB CSS | `vite build` |
-| Test suite | 25 tests in about 0.1 s | `manage.py test` |
+| Frontend bundle | about 381 kB JS (116 kB gzip), about 21 kB CSS (after the 2026-10-21 UI work) | `vite build` |
+| Test suite | 29 backend tests in about 0.1 s (2026-10-22) | `manage.py test` |
 | Slider redraw time | **Not measured** numerically; design restyles existing segments (about 930 per 2,800 mi route set) without creating layers | - |
 
 Conclusion: server CPU is not the bottleneck. Wall time is dominated by the public APIs (geocode x2, OSRM, up to 4

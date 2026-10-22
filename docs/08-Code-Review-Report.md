@@ -31,7 +31,7 @@ the first build, then running `ruff`, `tsc`, `django check --deploy` and the dep
 
 ## 3. Static analysis results
 
-`ruff`: clean. `tsc --noEmit`: clean. `django check`: clean. Tests: 28 of 28 backend, 12 of 12 frontend.
+`ruff`: clean. `tsc --noEmit`: clean. `django check`: clean. Tests: 29 of 29 backend, 12 of 12 frontend (re-run 2026-10-22).
 
 ## 4. Simplicity check
 

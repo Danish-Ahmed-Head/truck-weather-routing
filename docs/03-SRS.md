@@ -44,7 +44,7 @@ Verification methods: T = automated test, D = demonstration in the running app, 
 | NFR-04 | The service limits request rate per client. | T |
 | NFR-05 | No secret is stored in code; production requires `DJANGO_SECRET_KEY`. | I |
 | NFR-06 | Dependencies have no known vulnerabilities at release. | pip-audit, npm audit |
-| NFR-07 | The map and form work at phone width and the slider is keyboard operable. | D (partial, doc 11) |
+| NFR-07 | The map and form work at phone width and the slider is keyboard operable. | D (doc 11; phone and tablet checked with results on 2026-10-21) |
 | NFR-08 | Documentation: README, assumptions, this set. | I |
 
 ## 4. Constraints

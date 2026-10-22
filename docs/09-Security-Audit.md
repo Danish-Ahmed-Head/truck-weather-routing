@@ -29,6 +29,7 @@ are sent to Nominatim, route coordinates to OSRM, checkpoint coordinates to Open
 | S-14 | Debug | `DJANGO_DEBUG` defaults off | - | Pass |
 | S-15 | Container | Image ran as root | Low | Fixed: runs as user `app` (UID 1000, verified). Image not scanned for CVEs |
 | S-16 | Third-party terms | Public OSRM, Nominatim and Open-Meteo have usage limits and (Open-Meteo free tier) non-commercial terms | Medium for production | **Open**: from knowledge, not re-read today; verify before any commercial use |
+| S-17 | Headers | `Referrer-Policy` was Django's default `same-origin`, which made the OpenStreetMap tile server refuse the map (defect D17) | Low | Fixed: `strict-origin-when-cross-origin`, sends only the site origin (no path or query) to other origins; covered by a test |
 
 ## 3. Accepted risks need owner sign-off
 

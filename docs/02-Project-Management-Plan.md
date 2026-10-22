@@ -40,9 +40,11 @@ Status: Done = built, tested, run, verified.
 | T14 | CI pipeline (GitHub Actions) | 3 | Done: first run failed on a real finding (D16), second run green (backend, frontend, docker) |
 | T17 | Unknown-weather policy (FR-12): backend, UI, tests | 3 | Done, 3 backend tests, UI checked with a patched response |
 | T15 | Docker image build verified | 2 | Done 2026-10-20: built with Docker 29.6.1, run with `PORT=9000` as non-root, gunicorn on Linux, 3 routes returned |
-| T16a | Hosting target chosen and prepared (PythonAnywhere free, upload bundle, guide in doc 13) | 2 | Done; bundle tested locally, **not deployed** |
+| T16a | Hosting target chosen and prepared (PythonAnywhere free, upload bundle, guide in doc 13) | 2 | Done; bundle tested locally. Deployed by git pull instead (T16c) |
 | T16b | GitHub repo | 3 | Done 2026-10-20: public repo `Danish-Ahmed-Head/truck-weather-routing`, pushed with the owner's approval |
 | T16c | Deployment to PythonAnywhere | 3 | Done 2026-10-20: https://danish12ahmed.pythonanywhere.com, health OK, live search returned 3 routes. Expires 2026-11-20 unless renewed monthly |
+| T18 | Fix blank map on the live site (OpenStreetMap 403, defect D17) | 4 | Done 2026-10-21: referrer policy setting plus 1 test, redeployed, verified live |
+| T19 | UI cleanup: route cards, readable risk pills, loading message, map fit above heat panel, phone layout | 4 | Done 2026-10-21: checked on desktop, 375 px and 768 px, locally and live (defects D18 to D20 found and fixed) |
 | T16d | Loom walkthrough and submission | - | **Not started, needs owner approval** |
 
 ## 4. Effort
@@ -62,7 +64,7 @@ how this work counts against it.
 
 ## 5b. Open questions for the owner (nothing here is assumed)
 
-Q1 hosting: decided, PythonAnywhere free (deploy step is the owner's). Q2 repo visibility: decided, public. Q3 deadline: working deadline Thu 2026-10-23 (chosen by the owner; not stated in the email).
+Q1 hosting: decided, PythonAnywhere free (deploy step is the owner's). Q2 repo visibility: decided, public. Q3 deadline: working deadline Fri 2026-10-23 (the date was the owner's choice; the weekday was corrected from Thu on 2026-10-22; the email, received Mon 2026-10-19 17:58, gives no deadline, so 4 days run to about Fri 2026-10-23 17:58 in the owner's Gmail time zone; unconfirmed).
 Q4 rule boundaries: confirmed (SRS A-01); A-02 to A-06 still unconfirmed. Q5 CI and frontend tests: both added.
 Q6 domain name, which decides HSTS settings: still open. Null-weather policy: decided (FR-12).
 

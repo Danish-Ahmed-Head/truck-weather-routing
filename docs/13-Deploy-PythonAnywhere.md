@@ -1,7 +1,7 @@
 # 13 Deployment Guide: PythonAnywhere (free Beginner plan)
 
 Decision recorded 2026-10-20: host on PythonAnywhere free. Pricing and limits read from the vendor pages on 2026-10-20.
-Status: **deployed and verified 2026-10-20** at https://danish12ahmed.pythonanywhere.com (health check OK, full search returned 3 routes).
+Status: **deployed and verified 2026-10-20; updated and re-verified 2026-10-21 (commit f13fea0)** at https://danish12ahmed.pythonanywhere.com (health check OK, full search returned 3 routes).
 
 ## 1. Fit with the free plan
 
@@ -40,6 +40,12 @@ tooling was removed.
 
 In a Bash console: `cd ~/truck-weather-routing && git pull`. If the frontend changed, rebuild it as in step 3 (or ask for the bundle route
 using `scripts/make_bundle.py` and the Files tab upload). Then click **Reload** on the Web tab.
+
+Verified on 2026-10-21 (twice): in the Bash console run `cd ~/truck-weather-routing && git pull origin master`, then
+`python3.12 -m venv ~/nodeenv && ~/nodeenv/bin/pip install -q nodejs-wheel && export PATH=$HOME/nodeenv/bin:$PATH && cd frontend && npm ci && npm run build`,
+then `rm -rf ~/nodeenv ~/truck-weather-routing/frontend/node_modules`, then Reload. It takes about two minutes, mostly the pip install.
+Backend-only changes need only the pull and Reload. Check the update took effect by comparing the `assets/index-*.js` name in the page source
+with the new build, and `curl -I` for new headers. Do not rebuild on the day of a review if the CPU meter is high (100 s per day).
 
 ## 4. Keeping it alive
 
